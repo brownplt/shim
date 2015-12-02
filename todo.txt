@@ -1,0 +1,11 @@
+- Make on/to-particle work simply
+  - No option return for to-particle, always send
+  - Convert to/from json automatically where needed
+  - Can add more complicated interfaces later
+- Instead of string-dict, consolidate information about cores
+  into their own datatype
+  - name
+  - access code
+  - shim?
+- Can represent use of stream without specific core in mind as
+  separate version of datatype.
