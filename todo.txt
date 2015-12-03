@@ -9,3 +9,6 @@
   - shim?
 - Can represent use of stream without specific core in mind as
   separate version of datatype.
+- Add a polling per x seconds for digital and analog inputs.
+- Change AnalogInputTrigger/ait- to a better name, like AnalogCondition
+  (or if we need digital conditions for polling, something more general).
