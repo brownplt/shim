@@ -1,3 +1,5 @@
+- Add direct, imperative commands for sending events on stream
+  - receiving events with callback
 - Make on/to-particle work simply
   - No option return for to-particle, always send
   - Convert to/from json automatically where needed
@@ -12,3 +14,6 @@
 - Add a polling per x seconds for digital and analog inputs.
 - Change AnalogInputTrigger/ait- to a better name, like AnalogCondition
   (or if we need digital conditions for polling, something more general).
+
+Possible features:
+ - Core-to-core communication via events directly, configuration?

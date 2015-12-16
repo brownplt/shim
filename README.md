@@ -2,6 +2,8 @@
 
 *Important Note*: The following code currently works only with the [Horizon](http://pyret-horizon.herokuapp.com) version of CPO.
 
+The code for the shim to put onto Particle cores is in this repository as [core_shim.ino](https://raw.githubusercontent.com/sstrickl/shim/master/core_shim.ino).  Information about flashing this shim onto your device is available at the [Web IDE](https://docs.particle.io/guide/getting-started/build/core/) documentation on [Particle](http://particle.io)'s site.
+
 ### Modules
 
 ```
