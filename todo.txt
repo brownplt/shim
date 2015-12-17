@@ -13,6 +13,9 @@
   - No option return for to-particle, always send
   - Convert to/from json automatically where needed
   - Can add more complicated interfaces later
+- Add specifics to documentation on how to find stuff like core short name,
+  access code, etc. via web and via command line
+- Mention `subscribe mine` as debugging source
 - Error handling, e.g., authentication errors
 - Add a polling per x seconds for digital and analog inputs.
 - Change AnalogInputTrigger/ait- to a better name, like AnalogCondition
