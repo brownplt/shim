@@ -167,8 +167,8 @@ struct pin_config* parse_config(const char *str) {
         i += 2; // skip past ":I"
         if(is_analog_input(ret->pin)) {
           i++; // skip past ":"
-          if(sscanf(cur_pos + i, "%u", &ret->min_value) <= 0 ||
-             ret->min_value > 4095) {
+          if(sscanf(cur_pos + i, "%d", &ret->min_value) <= 0 ||
+             ret->min_value < 0 || ret->min_value > 4095) {
             free_config(ret);
             delay(1000);
             Spark.publish("config_bad_min", cur_pos, 60, PRIVATE);
@@ -176,8 +176,8 @@ struct pin_config* parse_config(const char *str) {
           }
           while(isdigit(cur_pos[i])) { i++; }
           i++; // Skip past '-'
-          if(sscanf(cur_pos + i, "%u", &ret->max_value) <= 0 ||
-             ret->max_value > 4095) {
+          if(sscanf(cur_pos + i, "%d", &ret->max_value) <= 0 ||
+             ret->min_value < 0 || ret->max_value > 4095) {
             free_config(ret);
             delay(1000);
             Spark.publish("config_bad_max", cur_pos, 60, PRIVATE);
@@ -261,31 +261,36 @@ void emit_dump(const char *ename, struct pin_config *config) {
   int i = 0;
   for(curr = config; curr != NULL; curr = curr->next) {
     int name_len = strlen(curr->event);
-    // 10 = ':' + 4 digit num + '-' + 4 digit num
+    // 10 = ':' + 4 digit num + '-' + 4 digit num -> worst case length
     int curr_size = name_len + 6 + 10;
     if(i + curr_size + 1 > 255) {
       delay(1000);
       Spark.publish("config_too_long", NULL, 60, PRIVATE);
     }
-    strncpy(s + i, curr->event, strlen(curr->event));
-    s[i + name_len] = ':';
-    strncpy(s + i + name_len + 1, pin_to_string(curr->pin), 2);
-    s[i + name_len + 3] = ':';
+    strncpy(s + i, curr->event, name_len);
+    i += name_len;
+    s[i] = ':';
+    i++;
+    strncpy(s + i, pin_to_string(curr->pin), 2);
+    i += 2;
+    s[i] = ':';
+    i++;
     if(curr->input) {
       int printed;
       if(is_analog_input(curr->pin)) {
-        printed = sprintf(s + i + name_len + 4, "I:%u-%u\n",
+        printed = sprintf(s + i, "I:%d-%d",
                           curr->min_value, curr->max_value);
-        curr_size = i + name_len + 4 + printed;
+        i += printed;
       } else {
-        sprintf(s + i + name_len + 4, "I\n");
-        curr_size = i + name_len + 6;
+        sprintf(s + i, "I");
+        i++;
       }
     } else {
-      sprintf(s + i + name_len + 4, "O\n");
-      curr_size = i + name_len + 6;
+      sprintf(s + i, "O");
+      i++;
     }
-    i += curr_size;
+    sprintf(s + i, "\n");
+    i++;
   }
   delay(1000);
   Spark.publish(ename, s, 60, PRIVATE);
