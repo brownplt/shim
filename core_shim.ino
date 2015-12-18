@@ -170,8 +170,8 @@ struct pin_config* parse_config(const char *str) {
           if(sscanf(cur_pos + i, "%u", &ret->min_value) <= 0 ||
              ret->min_value > 4095) {
             free_config(ret);
-            Spark.publish("config_bad_min", cur_pos, 60, PRIVATE);
             delay(1000);
+            Spark.publish("config_bad_min", cur_pos, 60, PRIVATE);
             return NULL;
           }
           while(isdigit(cur_pos[i])) { i++; }
@@ -179,8 +179,8 @@ struct pin_config* parse_config(const char *str) {
           if(sscanf(cur_pos + i, "%u", &ret->max_value) <= 0 ||
              ret->max_value > 4095) {
             free_config(ret);
-            Spark.publish("config_bad_max", cur_pos, 60, PRIVATE);
             delay(1000);
+            Spark.publish("config_bad_max", cur_pos, 60, PRIVATE);
             return NULL;
           }
         }
