@@ -330,19 +330,19 @@ void name_handler(const char *event, const char *data) {
   unsigned i = 0;
   strncpy(s, data, 63);
   while(s[i] != '\0' && i < 56) { i++; } // include space for suffixes below
-  if(i >= 56) { Particle.publish("name_too_long", NULL, 60, PRIVATE); }
-  Particle.publish("name_received", s, 60, PRIVATE);
+  if(i >= 56) { Spark.publish("name_too_long", NULL, 60, PRIVATE); }
+  Spark.publish("name_received", s, 60, PRIVATE);
   strcpy(s + i, "_config");
-  Particle.subscribe(s, configure, MY_DEVICES);
+  Spark.subscribe(s, configure, MY_DEVICES);
   strcpy(s + i, "_event");
-  Particle.subscribe(s, event_handler, MY_DEVICES);
+  Spark.subscribe(s, event_handler, MY_DEVICES);
   strcpy(s + i, "_dump");
-  Particle.subscribe(s, dump, MY_DEVICES);
+  Spark.subscribe(s, dump, MY_DEVICES);
 }
 
 void setup() {
-  Particle.subscribe("spark/", name_handler);
-  Particle.publish("spark/device/name", NULL, 60, PRIVATE);
+  Spark.subscribe("spark/", name_handler);
+  Spark.publish("spark/device/name", NULL, 60, PRIVATE);
 }
 
 void loop() {
@@ -355,7 +355,7 @@ void loop() {
           curr->old_value = curr_val;
           char s[10];
           sprintf(s, "%d", curr_val);
-          Particle.publish(curr->event, s, 60, PRIVATE);
+          Spark.publish(curr->event, s, 60, PRIVATE);
           delay(1000);
         }
       } else {
@@ -367,7 +367,7 @@ void loop() {
               curr_val >= curr->min_value)) {
             char s[10];
             sprintf(s, "%d", curr_val);
-            Particle.publish(curr->event, s, 60, PRIVATE);
+            Spark.publish(curr->event, s, 60, PRIVATE);
             delay(1000);
           }
         } else if (curr->min_value < curr->max_value) {
@@ -376,7 +376,7 @@ void loop() {
              (curr_val >= curr->min_value && curr_val <= curr->max_value)) {
             char s[10];
             sprintf(s, "%d", curr_val);
-            Particle.publish(curr->event, s, 60, PRIVATE);
+            Spark.publish(curr->event, s, 60, PRIVATE);
             delay(1000);
           }
         } else {
@@ -385,7 +385,7 @@ void loop() {
              (curr_val <= curr->min_value || curr_val >= curr->max_value)) {
             char s[10];
             sprintf(s, "%d", curr_val);
-            Particle.publish(curr->event, s, 60, PRIVATE);
+            Spark.publish(curr->event, s, 60, PRIVATE);
             delay(1000);
           }
         }
