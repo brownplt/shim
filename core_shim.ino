@@ -163,26 +163,32 @@ struct pin_config* parse_config(const char *str) {
     if(cur_pos[i] == ':') {
       switch(cur_pos[i+1]) {
       case 'I':
-        {
-          int min = 0, max = 0;
-          ret->input = 1;
-          i += 2;
-          if(is_analog_input(ret->pin) &&
-             (sscanf(cur_pos + i, "%u-%u", &min, &max) < 0 ||
-              min > 4095 || max > 4095)) {
+        ret->input = 1;
+        i += 2; // skip past ":I"
+        if(is_analog_input(ret->pin)) {
+          i++; // skip past ":"
+          if(sscanf(cur_pos + i, "%u", &ret->min_value) <= 0 ||
+             ret->min_value > 4095) {
             free_config(ret);
-            Spark.publish("config_bad_range", cur_pos, 60, PRIVATE);
+            Spark.publish("config_bad_min", cur_pos, 60, PRIVATE);
             delay(1000);
             return NULL;
           }
-          ret->min_value = min;
-          ret->max_value = max;
-          while(!isspace(cur_pos[i])) { i++; }
-          break;
+          while(isdigit(cur_pos[i])) { i++; }
+          i++; // Skip past '-'
+          if(sscanf(cur_pos + i, "%u", &ret->max_value) <= 0 ||
+             ret->max_value > 4095) {
+            free_config(ret);
+            Spark.publish("config_bad_max", cur_pos, 60, PRIVATE);
+            delay(1000);
+            return NULL;
+          }
         }
+        while(!isspace(cur_pos[i])) { i++; }
+        break;
       case 'O':
         ret->input = 0;
-        i += 2;
+        i += 2; // skip past ":O"
         break;
       default:
         free_config(ret);
