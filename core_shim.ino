@@ -185,7 +185,6 @@ struct pin_config* parse_config(const char *str) {
           }
           while(isdigit(cur_pos[i])) { i++; }
         }
-        while(!isspace(cur_pos[i])) { i++; }
         break;
       case 'O':
         ret->input = 0;
