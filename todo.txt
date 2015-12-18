@@ -17,6 +17,9 @@
   access code, etc. via web and via command line
 - Mention `subscribe mine` as debugging source
 - Error handling, e.g., authentication errors
+  - include things like "not getting a response from the core on config in
+    XX seconds"
+  - to-particle needs to check the result from the handler more carefully
 - Add a polling per x seconds for digital and analog inputs.
 - Change AnalogInputTrigger/ait- to a better name, like AnalogCondition
   (or if we need digital conditions for polling, something more general).
