@@ -245,17 +245,17 @@ void configure(const char *event, const char *edata) {
     pinMode(D7, OUTPUT);
     digitalWrite(D7, HIGH);
     delay(1000);
-    emit_dump("config_stored");
+    emit_dump("config_stored", config);
     digitalWrite(D7, LOW);
     setup_config(config);
   }
 }
 
 void dump(const char *event, const char *edata) {
-  emit_dump("core_dump");
+  emit_dump("core_dump", config);
 }
 
-void emit_dump(const char *ename) {
+void emit_dump(const char *ename, struct pin_config *config) {
   struct pin_config *curr = config;
   char s[255];
   int i = 0;
