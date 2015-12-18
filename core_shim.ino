@@ -349,8 +349,9 @@ void loop() {
   struct pin_config *curr = config;
   for(; curr != NULL; curr = curr->next) {
     if(curr->input) {
+      int curr_val;
       if(!is_analog_input(curr->pin)) {
-        int curr_val = digitalRead(curr->pin);
+        curr_val = digitalRead(curr->pin);
         if(curr->old_value != curr_val) {
           curr->old_value = curr_val;
           char s[10];
@@ -359,7 +360,7 @@ void loop() {
           delay(1000);
         }
       } else {
-        int curr_val = analogRead(curr->pin);
+        curr_val = analogRead(curr->pin);
         if(curr->min_value == curr->max_value) {
           if((curr->old_value > curr->min_value &&
               curr_val <= curr->min_value) ||
@@ -389,8 +390,8 @@ void loop() {
             delay(1000);
           }
         }
-        curr->old_value = curr_val;
       }
+      curr->old_value = curr_val;
     }
   }
 }
