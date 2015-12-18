@@ -239,18 +239,20 @@ void configure(const char *event, const char *edata) {
     pinMode(D7, OUTPUT);
     digitalWrite(D7, HIGH);
     delay(1000);
-    Spark.publish("config_stored", NULL, 60, PRIVATE);
+    emit_dump("config_stored");
     digitalWrite(D7, LOW);
     setup_config(config);
   }
 }
 
 void dump(const char *event, const char *edata) {
+  emit_dump("core_dump");
+}
+
+void emit_dump(const char *ename) {
   struct pin_config *curr = config;
   char s[255];
-  char data[255];
   int i = 0;
-  memcpy(data, edata, 255);
   for(curr = config; curr != NULL; curr = curr->next) {
     int name_len = strlen(curr->event);
     // 10 = ':' + 4 digit num + '-' + 4 digit num
@@ -280,7 +282,7 @@ void dump(const char *event, const char *edata) {
     i += curr_size;
   }
   delay(1000);
-  Spark.publish("core_dump", s, 60, PRIVATE);
+  Spark.publish(ename, s, 60, PRIVATE);
 }
 
 /* Meta-event handler. String in data should be of the form:
