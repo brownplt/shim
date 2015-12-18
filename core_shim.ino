@@ -183,6 +183,7 @@ struct pin_config* parse_config(const char *str) {
             Spark.publish("config_bad_max", cur_pos, 60, PRIVATE);
             return NULL;
           }
+          while(isdigit(cur_pos[i])) { i++; }
         }
         while(!isspace(cur_pos[i])) { i++; }
         break;
