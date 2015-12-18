@@ -352,11 +352,11 @@ void loop() {
   for(; curr != NULL; curr = curr->next) {
     if(curr->input) {
       int curr_val;
+      char s[10] = { 0 };
       if(!is_analog_input(curr->pin)) {
         curr_val = digitalRead(curr->pin);
         if(curr->old_value != curr_val) {
           curr->old_value = curr_val;
-          char s[10];
           sprintf(s, "%d", curr_val);
           Spark.publish(curr->event, s, 60, PRIVATE);
           delay(1000);
@@ -368,7 +368,6 @@ void loop() {
               curr_val <= curr->min_value) ||
              (curr->old_value < curr->min_value &&
               curr_val >= curr->min_value)) {
-            char s[10];
             sprintf(s, "%d", curr_val);
             Spark.publish(curr->event, s, 60, PRIVATE);
             delay(1000);
@@ -377,7 +376,6 @@ void loop() {
           if((curr->old_value < curr->min_value ||
               curr->old_value > curr->max_value) &&
              (curr_val >= curr->min_value && curr_val <= curr->max_value)) {
-            char s[10];
             sprintf(s, "%d", curr_val);
             Spark.publish(curr->event, s, 60, PRIVATE);
             delay(1000);
@@ -386,7 +384,6 @@ void loop() {
           if((curr->old_value >= curr->min_value &&
               curr->old_value <= curr->max_value) &&
              (curr_val < curr->min_value || curr_val > curr->max_value)) {
-            char s[10];
             sprintf(s, "%d", curr_val);
             Spark.publish(curr->event, s, 60, PRIVATE);
             delay(1000);
