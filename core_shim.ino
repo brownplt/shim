@@ -372,8 +372,8 @@ void loop() {
             delay(1000);
           }
         } else if (curr->min_value < curr->max_value) {
-          if(!(curr->old_value >= curr->min_value &&
-               curr->old_value <= curr->max_value) &&
+          if((curr->old_value < curr->min_value ||
+              curr->old_value > curr->max_value) &&
              (curr_val >= curr->min_value && curr_val <= curr->max_value)) {
             char s[10];
             sprintf(s, "%d", curr_val);
@@ -381,8 +381,8 @@ void loop() {
             delay(1000);
           }
         } else {
-          if(!(curr->old_value < curr->min_value ||
-               curr->old_value > curr->max_value) &&
+          if((curr->old_value >= curr->min_value &&
+              curr->old_value <= curr->max_value) &&
              (curr_val < curr->min_value || curr_val > curr->max_value)) {
             char s[10];
             sprintf(s, "%d", curr_val);
