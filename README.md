@@ -19,7 +19,25 @@ have our shim code installed, it allows for remotely configuring pins.
 The `json` module provides tools for creating JSON values and
 converting between Pyret values and JSON values.  Like many Particle
 projects, we have chosen JSON as the serialization method of choice
-for data sent via Particle events.
+for data sent via Particle events.  The module provides the following
+function for converting Pyret values into `json`:
+
+`tojson :: (Any) -> JSON`
+
+JSON values themselves consist of a datatype with the following
+constructors:
+
+* `j-null :: JSON`: Represents the JavaScript value `null`.
+* `j-bool :: (Boolean) -> JSON`: Represents a JavaScript boolean.
+* `j-num :: (Number) -> JSON`: Represents a JavaScript number.
+* `j-str :: (String) -> JSON`: Represents a JavaScript string.
+* `j-arr :: (List<JSON>) -> JSON`: Represents a JavaScript array.
+* `j-obj :: (StringDict<JSON>) -> JSON`: Represents a JavaScript object.
+
+JSON values also contain the following methods:
+
+* `native :: () -> Any`: Converts the JSON value into the equivalent Pyret value.  This conversion is deep, in that any contents of the value is converted as well.
+* `serialize :: () -> String`: Converts the JSON value into a String representation that can be read by any standard JSON parser.
 
 ### Shared Configuration Information
 
