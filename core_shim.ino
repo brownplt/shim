@@ -260,6 +260,11 @@ void dump(const char *event, const char *edata) {
   emit_dump("core_dump", config);
 }
 
+int ext_dump(String arg) {
+  emit_dump("core_dump", config);
+  return 0;
+}
+
 void emit_dump(const char *ename, struct pin_config *config) {
   struct pin_config *curr = config;
   char s[255];
@@ -363,6 +368,7 @@ void setup() {
   Spark.function("digitalwrite", tinkerDigitalWrite);
   Spark.function("analogread", tinkerAnalogRead);
   Spark.function("analogwrite", tinkerAnalogWrite);
+  Spark.function("dump", ext_dump);
   Spark.subscribe("spark/", name_handler);
   Spark.publish("spark/device/name", NULL, 60, PRIVATE);
 }
