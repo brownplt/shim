@@ -56,7 +56,7 @@ opts = [SD.string-dict: "acc", "46aa662f4b2fe1beb009a49709e66bcd498ef85e",
 ```
 The currently available set of keys are:
 
-* `"acc" -> String` : your Particle access code for authorization,
+* `"acc" -> String` : your Particle access token for authorization,
 * `"core" -> String` : the short name of the core being configured/used,
 * `"host" -> String` : the hostname for a private Particle server, if one is being used, and
 * `"raw" -> Boolean` : false (the default) if this code is being used with a core that has our shim installed, and true if you want to avoid our encoding of events for use with non-shim cores or with other Particle stream-using programs.
@@ -130,7 +130,7 @@ receiving events from the Particle event stream,
 
 and one for sending events to the Particle event stream,
 
-`to-particle :: ((World) -> Option<JSON>, String, StringDict) -> WorldConfig`
+`to-particle :: (World -> Option<JSON>, String, StringDict) -> WorldConfig`
 
 The `on-particle` function takes a callback that expects a world and
 the `JSON` data associated with a Particle event, an event name, and
@@ -163,11 +163,11 @@ appropriate count.  That is, these functions will be installed using
 the `on-particle` registration function.
 
 ```
-fun on-button(a-world,edata):
+fun on-button(a-world, edata):
   world(a-world.bevents + 1, a-world.mevents)
 end
 
-fun on-motion(a-world,edata):
+fun on-motion(a-world, edata):
   world(a-world.bevents, a-world.mevents + 1)
 end
 ```
@@ -197,13 +197,13 @@ import image as I
 
 fun draw-square(value):
   # Start displaying only after 3rd tick
-  text-img = I.text(tostring(value.bevents) + "   " +
+  I.text(tostring(value.bevents) + "   " +
     tostring(value.mevents), 24, "black")
 end
 
 fun to-draw(a-world):
   text = draw-square(a-world)
-  I.place-image(text, 100, 100, I.empty-scene(300, 300))      
+  I.place-image(text, 100, 100, I.empty-scene(300, 300))
 end
 ```
 
