@@ -484,8 +484,9 @@ void loop() {
             published = true;
           }
         } else {
-          if((old_val  >= curr->min_value && old_val  <= curr->max_value) &&
-             (curr_val <  curr->min_value || curr_val >  curr->max_value)) {
+          // Remember, min and max are INVERTED for this case!
+          if((old_val  >= curr->max_value && old_val  <= curr->min_value) &&
+             (curr_val <  curr->max_value || curr_val >  curr->min_value)) {
             sprintf(s, "%d", curr_val);
             Spark.publish(curr->event, s, 60, PRIVATE);
             published = true;
