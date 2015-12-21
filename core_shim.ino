@@ -57,6 +57,56 @@ const char *pin_to_string(int pin) {
   }
 }
 
+int pin_to_index(int pin) {
+  switch(pin) {
+  case A0:
+  case D0: return 0;
+  case A1:
+  case D1: return 1;
+  case A2:
+  case D2: return 2;
+  case A3:
+  case D3: return 3;
+  case A4:
+  case D4: return 4;
+  case A5:
+  case D5: return 5;
+  case A6:
+  case D6: return 6;
+  case A7:
+  case D7: return 7;
+  default: return -1;
+  }
+}
+
+int digital_index_to_pin(int idx) {
+  switch(idx) {
+  case 0: return D0;
+  case 1: return D1;
+  case 2: return D2;
+  case 3: return D3;
+  case 4: return D4;
+  case 5: return D5;
+  case 6: return D6;
+  case 7: return D7;
+  default: return -1;
+  }
+}
+
+int analog_index_to_pin(int idx) {
+  switch(idx) {
+  case 0: return A0;
+  case 1: return A1;
+  case 2: return A2;
+  case 3: return A3;
+  case 4: return A4;
+  case 5: return A5;
+  case 6: return A6;
+  case 7: return A7;
+  default: return -1;
+  }
+}
+
 int is_analog_input(int pin) {
   switch(pin) {
   case A0:
@@ -87,11 +137,13 @@ int is_analog_output(int pin) {
   }
 }
 
+int digital_cache[8] = { LOW };
+int analog_cache[8] = { 0 };
+
 struct pin_config {
   char *event;
   int pin;
   int input; // 0 for output, 1 for input
-  int old_value; // used for checking edges
   // The following two are used for analog input ranges. If you compare them:
   // ==   ====>   a single value, send events when result crosses value
   // <    ====>   a range, send events when value enters range
@@ -221,9 +273,9 @@ void setup_config(struct pin_config *p) {
     if(p->input) {
       pinMode(p->pin, INPUT_PULLDOWN);
       if(!is_analog_input(p->pin)) {
-        p->old_value = digitalRead(p->pin);
+        digital_cache[pin_to_index(p->pin)] = digitalRead(p->pin);
       } else {
-        p->old_value = analogRead(p->pin);
+        analog_cache[pin_to_index(p->pin)] = analogRead(p->pin);
       }
     } else {
       pinMode(p->pin, OUTPUT);
@@ -267,7 +319,7 @@ int ext_dump(String arg) {
 
 void emit_dump(const char *ename, struct pin_config *config) {
   struct pin_config *curr = config;
-  char s[255];
+  char s[255] = {0};
   int i = 0;
   for(curr = config; curr != NULL; curr = curr->next) {
     int name_len = strlen(curr->event);
@@ -365,60 +417,88 @@ void name_handler(const char *event, const char *data) {
 
 void setup() {
   Spark.function("digitalread", tinkerDigitalRead);
-  Spark.function("digitalwrite", tinkerDigitalWrite);
+  //Spark.function("digitalwrite", tinkerDigitalWrite);
   Spark.function("analogread", tinkerAnalogRead);
-  Spark.function("analogwrite", tinkerAnalogWrite);
+  //Spark.function("analogwrite", tinkerAnalogWrite);
   Spark.function("dump", ext_dump);
+  Spark.function("dump_caches", dump_caches);
   Spark.subscribe("spark/", name_handler);
   Spark.publish("spark/device/name", NULL, 60, PRIVATE);
 }
 
+int dump_caches(String data) {
+ char s[255];
+ int i, printed = 0;
+ printed += sprintf(s + printed, "{digital:[");
+ for(i = 0; i < 8; i++) {
+   printed += sprintf(s + printed, "%d,", digital_cache[i]);
+ }
+ printed += sprintf(s + printed, "],analog:[");
+ for(i = 0; i < 8; i++) {
+   printed += sprintf(s + printed, "%d,", analog_cache[i]);
+ }
+ printed += sprintf(s + printed, "]}");
+ delay(1000);
+ Spark.publish("cache_dump", s, 60, PRIVATE);
+ return 0;
+}
+
 void loop() {
   struct pin_config *curr = config;
+  int analog_vals[8] = {0};
+  int digital_vals[8] = {LOW};
+  int i;
+  bool published = false;
+  for(i = 0; i < 8; i++) {
+    analog_vals[i] = analogRead(analog_index_to_pin(i));
+    digital_vals[i] = digitalRead(digital_index_to_pin(i));
+  }
   for(; curr != NULL; curr = curr->next) {
     if(curr->input) {
-      int curr_val;
       char s[10] = { 0 };
+      int pin_index = pin_to_index(curr->pin);
       if(!is_analog_input(curr->pin)) {
-        curr_val = digitalRead(curr->pin);
-        if(curr->old_value != curr_val) {
-          curr->old_value = curr_val;
+        int curr_val = digital_vals[pin_index];
+        int old_val = digital_cache[pin_index];
+        if(old_val != curr_val) {
+          old_val = curr_val;
           sprintf(s, "%d", curr_val);
           Spark.publish(curr->event, s, 60, PRIVATE);
-          delay(1000);
+          published = true;
         }
       } else {
-        curr_val = analogRead(curr->pin);
+        int curr_val = analog_vals[pin_index];
+        int old_val = analog_cache[pin_index];
         if(curr->min_value == curr->max_value) {
-          if((curr->old_value > curr->min_value &&
-              curr_val <= curr->min_value) ||
-             (curr->old_value < curr->min_value &&
-              curr_val >= curr->min_value)) {
+          if((old_val > curr->min_value && curr_val <= curr->min_value) ||
+             (old_val < curr->min_value && curr_val >= curr->min_value)) {
             sprintf(s, "%d", curr_val);
             Spark.publish(curr->event, s, 60, PRIVATE);
-            delay(1000);
+            published = true;
           }
         } else if (curr->min_value < curr->max_value) {
-          if((curr->old_value < curr->min_value ||
-              curr->old_value > curr->max_value) &&
+          if((old_val  <  curr->min_value || old_val  >  curr->max_value) &&
              (curr_val >= curr->min_value && curr_val <= curr->max_value)) {
             sprintf(s, "%d", curr_val);
             Spark.publish(curr->event, s, 60, PRIVATE);
-            delay(1000);
+            published = true;
           }
         } else {
-          if((curr->old_value >= curr->min_value &&
-              curr->old_value <= curr->max_value) &&
-             (curr_val < curr->min_value || curr_val > curr->max_value)) {
+          if((old_val  >= curr->min_value && old_val  <= curr->max_value) &&
+             (curr_val <  curr->min_value || curr_val >  curr->max_value)) {
             sprintf(s, "%d", curr_val);
             Spark.publish(curr->event, s, 60, PRIVATE);
-            delay(1000);
+            published = true;
           }
         }
       }
-      curr->old_value = curr_val;
     }
   }
+  for(i = 0; i < 8; i++) {
+    analog_cache[i] = analog_vals[i];
+    digital_cache[i] = digital_vals[i];
+  }
+  if(published) { delay(1000); }
 }
 
 // The following is taken directly from Particle's Tinker app.
