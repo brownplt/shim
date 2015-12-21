@@ -81,8 +81,8 @@ module that are bound to their corresponding onboard names, so `A0`, `A1`,
 ... `A7`, `D0`, `D1`, ... `D7`.
 
 For example, the function call below configures the core
-to generate `"button"` event when pin D4 goes
-from `LOW` to `HIGH` and vice versa, respectively.  Finally,
+to generate a `"button"` event when pin D4 goes
+from `LOW` to `HIGH` and vice versa.  Finally,
 the core will watch for `"led"` events, and set the value of the D0
 pin according to the value attached to the event.
 
