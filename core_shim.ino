@@ -285,24 +285,27 @@ void setup_config(struct pin_config *p) {
 struct pin_config *config = NULL;
 
 void configure(const char *event, const char *edata) {
-  struct pin_config *new_config = NULL;
+  struct pin_config *new_config_item = NULL;
   char data[255];
-  if(edata == NULL) {
+  if(edata == NULL || edata[0] == '\0') {
+    free_config(config);
+    config = NULL;
     delay(1000);
-    Spark.publish("config_missing", NULL, 60, PRIVATE);
+    Spark.publish("config_cleared", NULL, 60, PRIVATE);
     return;
   }
   memcpy(data, edata, 255);
-  new_config = parse_config(data);
-  if(new_config != NULL) {
-    free_config(config);
-    config = new_config;
+  new_config_item = parse_config(data);
+  if(new_config_item != NULL) {
+    struct pin_config *prev = new_config_item;
+    for(; prev->next != NULL; prev = prev->next) {}
+    prev->next = config;
+    config = new_config_item;
     pinMode(D7, OUTPUT);
     digitalWrite(D7, HIGH);
-    delay(1000);
-    emit_dump("config_stored", config);
-    digitalWrite(D7, LOW);
     setup_config(config);
+    delay(50);
+    digitalWrite(D7, LOW);
   }
 }
 
