@@ -219,3 +219,4 @@ fun start():
     ])
 end
 ```
+The complete Pyret program for this example is in [shim-demo.arr](./shim-demo.arr).
