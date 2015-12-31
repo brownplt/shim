@@ -4,12 +4,12 @@
   - name
   - access code
   - shim?
-- [ ] Can represent use of stream without specific core in mind as
+- [x] Can represent use of stream without specific core in mind as
   separate version of datatype.
-- [ ] Change configure-core to configure each part separately, return
+- [x] Change configure-core to configure each part separately, return
   a programmatic value as return that can be fed into handler functions
-- [ ] Add direct, imperative commands for sending events on stream
-  - receiving events with callback
+- [x] Add direct, imperative commands for sending events on stream
+  - [ ] receiving events with callback
 - [ ] Make on/to-particle work simply
   - No option return for to-particle, always send
   - Convert to/from json automatically where needed
@@ -22,7 +22,7 @@
     XX seconds"
   - to-particle needs to check the result from the handler more carefully
 - [ ] Add a polling per x seconds for digital and analog inputs.
-- [ ] Change AnalogInputTrigger/ait- to a better name, like AnalogCondition
+- [x] Change AnalogInputTrigger/ait- to a better name, like AnalogCondition
   (or if we need digital conditions for polling, something more general).
 
 ## Possible features:
