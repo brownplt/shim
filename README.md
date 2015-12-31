@@ -81,16 +81,15 @@ module that are bound to their corresponding onboard names, so `A0`, `A1`,
 ... `A7`, `D0`, `D1`, ... `D7`.
 
 For example, the function call below configures the core
-to generate `"button"` and `"motion"` events when pins D0 and D2 goes
-from `LOW` to `HIGH` and vice versa, respectively.  Finally,
-the core will watch for `"led"` events, and set the value of the D4
+to generate a `"button"` event when pin D4 goes
+from `LOW` to `HIGH` and vice versa.  Finally,
+the core will watch for `"led"` events, and set the value of the D0
 pin according to the value attached to the event.
 
 ```
 P.configure-core([list:
-    P.pc-digital-read(P.D0,"button"),
-    P.pc-digital-read(P.D2, "motion"),
-    P.pc-write(P.D4, "led")],
+    P.pc-digital-read(P.D4,"button"),
+    P.pc-write(P.D0, "led")],
   opts)
 ```
 
@@ -144,31 +143,26 @@ emitted/received are encoded to work with our Particle core shim.  If
 it is mapped to `true`, then no encoding occurs.
 
 To illustrate the use of these registration functions, we'll write a
-world program that reads from the two
-pins we configured above (`"motion"` on `D0` and `"button"` on `D2`)
-and writes to the `"led"` pin on `D4` whenever a certain number of
-motion events or button presses have occurred.  First, we'll need to
+world program that reads from the `"button"` pin on `D4` that we configured
+above and writes to the `"led"` pin on `D0` whenever a certain number of
+button presses have occurred.  First, we'll need to
 create a data structure to describe the current state of the world.
 
 ```
 data World:
-  # bevents : button events, mevents : motion events
-  | world(bevents :: Number, mevents :: Number)
+  # bevents : button events
+  | world(bevents :: Number)
 end
 ```
 
-Next, we'll create functions that we will later install as handlers to
-run when their corresponding event is received and increment the
-appropriate count.  That is, these functions will be installed using
+Next, we'll create a function that we will later install as a handler to
+run when its corresponding event is received and increment the
+appropriate count.  That is, this function will be installed using
 the `on-particle` registration function.
 
 ```
 fun on-button(a-world, edata):
-  world(a-world.bevents + 1, a-world.mevents)
-end
-
-fun on-motion(a-world, edata):
-  world(a-world.bevents, a-world.mevents + 1)
+  world(a-world.bevents + 1)
 end
 ```
 
@@ -182,33 +176,32 @@ in Arduino C, and a non-zero value corresponds to `HIGH`.
 
 ```
 fun to-led(a-world):
-  if num-modulo(a-world.bevents,8) == 0: some(J.tojson(0))
-  else if num-modulo(a-world.bevents,4) == 0: some(J.tojson(1))
+  if num-modulo(a-world.bevents, 8) == 0: some(J.tojson(0))
+  else if num-modulo(a-world.bevents, 4) == 0: some(J.tojson(1))
   else: none
   end
 end
 ```
 
 Having some visual feedback other than the LED is also useful, so we'll
-display the two counts on the canvas.
+display the 'bevents' count on the canvas.
 
 ```
 import image as I
 
 fun draw-square(value):
   # Start displaying only after 3rd tick
-  I.text(tostring(value.bevents) + "   " +
-    tostring(value.mevents), 24, "black")
+  I.text(tostring(value.bevents), 24, "black")
 end
 
 fun to-draw(a-world):
   text = draw-square(a-world)
-  I.place-image(text, 100, 100, I.empty-scene(300, 300))
+  I.place-image(text, 100, 100, I.empty-scene(200, 200))
 end
 ```
 
 Finally, we'll create a function that, when run, starts up the world with
-an initial state of no button presses or motion events and installs the
+an initial state of no button presses and installs the
 handlers using `on-particle` and `to-particle` appropriately.
 
 ```
@@ -217,13 +210,12 @@ import world as W
 fun start():
   W.big-bang(
     # initial state
-    world(0,0),
+    world(0),
     # handlers
     [list:
       W.to-draw(to-draw),      
-      P.to-particle(to-led,"led",opts),
-      P.on-particle(on-button,"button",opts),
-      P.on-particle(on-motion,"motion",opts)
+      P.to-particle(to-led, "led", opts),
+      P.on-particle(on-button, "button", opts)
     ])
 end
 ```
