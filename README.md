@@ -220,3 +220,17 @@ fun start():
 end
 ```
 The complete Pyret program for this example is in [shim-demo.arr](./shim-demo.arr).
+
+### Interacting with the Shim from the REPL
+It is possible to directly interact with the core using the following API:
+```
+send-event :: (String, String, StringDict) -> None
+```
+For example, after configuring the core as described above, we can turn the LED on from the Pyret REPL like so:
+```
+> P.send-event("led", "1", opts)
+none
+```
+
+### Tips
+- It is helpful to have the event log running in a terminal by issuing `$ particle subsribe mine` for debugging purposes. See [Particle CLI doc](https://docs.particle.io/reference/cli/#particle-subscribe).
