@@ -163,7 +163,7 @@ void free_config(struct pin_config *p) {
 }
 
 /* Pin configs should be in the following format:
- * (event_name1:PN(:[IO]:\d+-\d+)?\s+)
+ * (event_name:PN(:[IO]:\d+-\d+)?\s+)
  * where event_name is the event that should be subscribed as a string
  * and PN is the pin name (that is, [AD][0-7]).  The I/O is for input/output
  * specification, and the numeric range should only appear if the pin is an
@@ -555,4 +555,3 @@ int tinkerWrite(String cmd)
         return 1;
 
 }
-
