@@ -1,16 +1,13 @@
 import particle as P
 import json as J
-import string-dict as SD
 import image as I
 import world as W
 
-opts = [SD.string-dict: "acc", "404738f94e7cb4d723edc11094b761cc3845f34c",
-  "core", "PLT-Core"]
+core = P.core("PLT-Core", "404738f94e7cb4d723edc11094b761cc3845f34c", true)
 
-P.configure-core([list:
-    P.pc-digital-read(P.D4,"button"),
-    P.pc-write(P.D0, "led")],
-  opts)
+P.clear-core-config(core)
+led-config = P.configure-core(core, P.write(P.D7, "led"))
+button-config = P.configure-core(core, P.digital-read(P.D4, "button"))
 
 data World:
   # bevents : button events
@@ -45,7 +42,7 @@ fun start():
     # handlers
     [list:
       W.to-draw(to-draw),
-      P.to-particle(to-led, "led", opts),
-      P.on-particle(on-button, "button", opts)
+      P.to-particle(to-led, led-config),
+      P.on-particle(on-button, button-config)
     ])
 end
