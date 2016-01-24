@@ -16,7 +16,7 @@
   - Can add more complicated interfaces later
 - [ ] Add specifics to documentation on how to find stuff like core short name,
   access code, etc. via web and via command line
-- [ ] Mention `subscribe mine` as debugging source
+- [x] Mention `subscribe mine` as debugging source
 - [ ] Error handling, e.g., authentication errors
   - include things like "not getting a response from the core on config in
     XX seconds"
